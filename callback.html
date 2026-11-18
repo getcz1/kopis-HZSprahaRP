@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Přihlašování…</title>
+<link rel="stylesheet" href="style.css?v=19">
+</head>
+<body>
+<div class="login"><div class="box" id="box"><h2>Probíhá ověření přes Discord…</h2><p class="muted">Za okamžik budete přesměrováni do systému.</p></div></div>
+<script>
+(async () => {
+  const box = document.getElementById('box');
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // chyba se zobrazí přímo zde i s důvodem, aby bylo jasné, co opravit
+  const fail = (m, detail) => { box.innerHTML = `<h2>Přihlášení se nezdařilo</h2><p class="error">${esc(m)}</p>${detail ? `<p class="muted">${esc(detail)}</p>` : ''}<a class="btn" href="index.html">Zpět na přihlášení</a>`; };
+  try {
+    const q = new URLSearchParams(location.search), h = new URLSearchParams(location.hash.slice(1));
+    if (q.get('error')) return fail('Přihlášení přes Discord bylo zrušeno nebo zamítnuto.', q.get('error_description') || q.get('error'));
+    if (!h.get('access_token')) return fail('Discord nevrátil přihlašovací token.', 'Zkontrolujte, že Redirect URL v Discord Developer Portal → OAuth2 je stejná jako adresa této stránky.');
+    if (h.get('state') !== sessionStorage['cad.oa']) return fail('Neplatný stav přihlášení.', 'Zkuste se přihlásit znovu, ve stejné záložce.');
+    const remember = sessionStorage['cad.oa.rem'] !== '0';
+    sessionStorage.removeItem('cad.oa'); sessionStorage.removeItem('cad.oa.rem');
+    let r, j = {};
+    // token ověří server; přihlášení pak drží v cookie, do prohlížeče se nic neukládá
+    try { r = await fetch('api.php?r=session', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: h.get('access_token'), terms: true, remember }) }); j = await r.json().catch(() => ({})); }
+    catch { return fail('Server není dostupný.', 'Zkontrolujte, že na webu existuje soubor api.php (nebo běží node server.js).'); }
+    if (!r.ok) {
+      const M = {
+        no_secret: ['Server nemá nastavený SESSION_SECRET.', 'Doplňte ho v souboru cad.env.php.'],
+        not_configured: ['Server nemá nastavené DISCORD_GUILD_ID a ID rolí.', 'Vyplňte cad.env.php na serveru.'],
+        not_member: ['Nejste členem Discord serveru, nebo je špatně DISCORD_GUILD_ID.', ''],
+        no_role: ['Na serveru nemáte žádnou z rolí potřebných pro vstup.', 'Počet vašich rolí na serveru: ' + (j.roleCount ?? '?') + '. Požádejte administrátora o přidělení role a zkontrolujte DISCORD_ROLE_* v cad.env.php.'],
+        discord_rejected: ['Discord odmítl ověření.', 'Zkuste se přihlásit znovu. (HTTP ' + (j.status ?? r.status) + ')'],
+        discord_unreachable: ['Server se nedokázal spojit s Discordem.', 'Zkontrolujte připojení serveru k internetu.'],
+        terms_required: ['Bez souhlasu s podmínkami nelze pokračovat.', '']
+      }[j.error] || ['Přihlášení se nezdařilo.', 'Chyba: ' + (j.error || r.status)];
+      return fail(M[0], M[1]);
+    }
+    location.replace('index.html');
+  } catch (e) { fail('Ověření přes Discord selhalo.', String((e && e.message) || e)); }
+})();
+</script>
+</body>
+</html>

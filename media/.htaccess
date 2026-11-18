@@ -1,0 +1,13 @@
+# Ve složce s videem se nesmí spouštět žádný skript.
+# Při chybě 500 tento soubor smažte – složka obsahuje jen video.
+<IfModule mod_authz_core.c>
+  <FilesMatch "(?i)\.(php|phtml|phps|phar|pl|py|cgi|sh)$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  <FilesMatch "(?i)\.(php|phtml|phps|phar|pl|py|cgi|sh)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+</IfModule>

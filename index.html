@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CAD</title>
+<link rel="stylesheet" href="style.css?v=19">
+</head>
+<body>
+<div id="alarm" class="alarm" hidden role="alert"></div>
+<div id="login" class="login">
+  <div class="box">
+    <h1>Systém CAD</h1>
+    <p class="muted">Přihlaste se účtem Discord. Práva se přidělí podle vašich rolí na serveru.</p>
+    <label class="chk"><input type="checkbox" id="rem" checked><span>Zůstat přihlášen na tomto zařízení <small class="muted">(přihlašovací cookie na 30 dní)</small></span></label>
+    <button id="dc" class="primary">Přihlásit přes Discord</button>
+    <div id="demo">
+      <h3>Demo režim</h3>
+      <p class="muted">Jen pro testování a první nastavení. V Admin → Discord jej lze vypnout.</p>
+      <input id="dn" placeholder="Jméno" maxlength="40">
+      <select id="dr"><option value="fire">Hasič</option><option value="commander">Velitel</option><option value="dispatch">Dispečer</option><option value="admin">Administrátor</option></select>
+      <button id="dgo">Vstoupit v demo režimu</button>
+    </div>
+    <p id="err" class="error" role="alert"></p>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <header>
+    <b id="srv"></b>
+    <nav id="tabs"></nav>
+    <button class="mini" data-legal title="Podmínky a cookies">Podmínky</button>
+    <button id="snd">Zapnout zvuk</button>
+    <span id="who"></span>
+    <span id="appv" class="muted" title="Verze aplikace"></span>
+    <span id="clock"></span>
+    <button id="out">Odhlásit</button>
+  </header>
+  <div id="neterr" class="warn" hidden role="alert"></div>
+  <main id="view"></main>
+</div>
+
+<dialog id="legal"></dialog>
+<dialog id="gate" class="gate"></dialog>
+<dialog id="detail"></dialog>
+<dialog id="newcall" class="big"></dialog>
+<dialog id="editcall"></dialog>
+<dialog id="backup"></dialog>
+<div id="vid" class="vid" hidden>
+  <div id="vidw"><video id="vidv" loop muted playsinline preload="metadata" aria-label="Video"></video><div id="viderr" class="viderr" hidden></div></div>
+  <button id="vidt" type="button" aria-pressed="true">Skrýt video</button>
+</div>
+<script>
+// Discord může uživatele vrátit na index.html (podle zadané Redirect URL) – výsledek se předá stránce callback.html
+if (/access_token=/.test(location.hash) || /[?&]error=/.test(location.search)) location.replace('callback.html' + location.search + location.hash);
+else { var s = document.createElement('script'); s.src = 'app.js?v=36'; document.body.appendChild(s); }
+</script>
+</body>
+</html>
