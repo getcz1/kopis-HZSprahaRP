@@ -1,3 +1,16 @@
-IGNORE cad.env.php
-diag.php
+# NIKDY nenahrávat na GitHub – obsahuje webhooky, ID rolí a tajný klíč
 cad.env.php
+cad.env
+.env
+*.env.local
+
+# Data systému (události, jednotky, osoby, nastavení) a nahrané zvuky
+cad-data/
+media/sounds/
+media/*.mp4
+media/*.webm
+
+# Nástroje
+node_modules/
+.DS_Store
+Thumbs.db
